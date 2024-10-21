@@ -10,12 +10,10 @@
 <body>
 	<h1>Detalle de la Canción</h1>
     <p><strong>Título:</strong> ${cancion.título}</p>
-    <p><strong>Artista:</strong> ${cancion.artista}</p>
+    <p><strong>Artista:</strong> ${cancion.artista.nombre} ${cancion.artista.apellido}</p>
     <p><strong>Álbum:</strong> ${cancion.álbum}</p>
     <p><strong>Género:</strong> ${cancion.género}</p>
     <p><strong>Idioma:</strong> ${cancion.idioma}</p>
-    <p><strong>Fecha de creación:</strong> ${cancion.fechaCreacion}</p>
-    <p><strong>Fecha de actualización:</strong> ${cancion.fechaActualizacion}</p>
     <a href="/canciones">Volver a la lista de canciones</a>
     
    <form action="/canciones/formulario/editar/${idCancion}">

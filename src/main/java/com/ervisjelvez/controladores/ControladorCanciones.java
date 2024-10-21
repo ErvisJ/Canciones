@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.ervisjelvez.modelos.Artista;
 import com.ervisjelvez.modelos.Cancion;
+import com.ervisjelvez.servicios.ServicioArtistas;
 import com.ervisjelvez.servicios.ServicioCanciones;
 
 import jakarta.validation.Valid;
@@ -21,11 +24,17 @@ import jakarta.validation.Valid;
 @Controller
 public class ControladorCanciones {
 	@Autowired
-    private ServicioCanciones servicioCanciones;
+	private final ServicioCanciones servicioCanciones;
 	
-	public ControladorCanciones(ServicioCanciones servicioCanciones) {
+	@Autowired
+	private final ServicioArtistas servicioArtistas;
+	
+	
+	public ControladorCanciones(ServicioCanciones servicioCanciones, ServicioArtistas servicioArtistas) {
 		this.servicioCanciones = servicioCanciones;
+		this.servicioArtistas = servicioArtistas;
 	}
+	
 	//todas las canciones
      @GetMapping("/canciones")
    public String desplegarCanciones(Model modelo) {
@@ -42,19 +51,22 @@ public class ControladorCanciones {
      }
      //agregar canciones
      @GetMapping("/canciones/formulario/agregar/{idCancion}")
-     public String formularioAgregarCancion(Model model) {
+ 	public String formularioAgregarCancion(@ModelAttribute Cancion cancion, Model model) {
     	 model.addAttribute("cancion", new Cancion());
-    	 return "agregarCancion.jsp";
-     }
-     
-     @PostMapping("/canciones/procesa/agregar")
-     public String procesarAgregarCancion(@Valid @ModelAttribute("cancion") Cancion cancion, BindingResult result, Model model) {
-         if (result.hasErrors()) {
-             return "agregarCancion.jsp";
-         }
-         servicioCanciones.agregarCancion(cancion);
-         return "redirect:/canciones";
-     }
+ 		model.addAttribute("artistas", servicioArtistas.obtenerTodosLosArtistas());
+ 		return "agregarCancion.jsp";
+ 	}
+ 	
+ 	@PostMapping("/canciones/procesa/agregar")
+ 	public String procesarAgregarCancion(@RequestParam("artistaId") Long artistaId, @ModelAttribute Cancion cancion, BindingResult validation) {
+ 		if(validation.hasErrors()) {
+ 			return "agregarCancion.jsp";
+ 		}
+ 		Artista artista = this.servicioArtistas.obtenerArtistaPorId(artistaId);
+ 		cancion.setArtista(artista);
+ 		this.servicioCanciones.agregarCancion(cancion);
+ 		return "redirect:/canciones";
+ 	}
      //editar
      @GetMapping("/canciones/formulario/editar/{idCancion}")
      public String formularioEditarCancion(@ModelAttribute("cancion") Cancion cancion, 
